@@ -65,6 +65,8 @@ app.post("/googlelogin", (req, res)=>{
     }
 })
 })
+
+
 app.post("/facebooklogin", (req, res)=>{
     const {userId, accessToken}=req.body;
     let urlGraphFacebook=`https://graph.facebook.com/v2.11/${userId}/?fields=id,name,email&access_token=${accessToken}`;
@@ -98,6 +100,43 @@ app.post("/facebooklogin", (req, res)=>{
             }
         });
     });
+})
+
+app.post('/updateUser', (req, res)=>{
+    const {user,id} = req.body;
+    console.log(user);
+    // console.log(id);
+    userTemplate.updateOne({username:id}, {$set:{
+        email:user.email,
+        username:user.username,
+        name:user.name,
+        bio:user.bio,
+        themes:user.themes,
+        links:user.links,
+        avatar:user.avatar,
+    }})
+    .then(result=>{
+        res.json(result);
+        console.log("user details updated for "+id);
+    })
+    .catch(err=>{
+        res.json(err);
+        console.log('error');
+    })
+})
+
+app.post("/userDetails", (req,res) => {
+    const {id} = req.body;
+    //console.log(path);
+    userTemplate.find({username:id}, (err,result) => {
+        if(err){
+            console.log(err)
+        }
+        else{
+            //console.log(result)
+            res.send(result);
+        }
+    })
 })
 
 app.listen(process.env.PORT||5000, ()=>{
