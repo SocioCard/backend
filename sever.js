@@ -9,7 +9,6 @@ const jwt=require("jsonwebtoken");
 const {OAuth2Client}=require('google-auth-library');
 const client=new OAuth2Client("769406402556-njlr65a4ujf3t6knd4dv7hj4jf0f6ihv.apps.googleusercontent.com");
 const userTemplate=require('./userTemplate');
-
 dotenv.config();
 
 //Connecting mongodb 
@@ -24,6 +23,26 @@ app.get("/", (req, res)=>{
     res.status(200).send("Hello world")
 })
 
+
+// json web token verification
+const verifyJwt=(req, res, next)=>{
+    const token=req.headers['x-access-token'];
+    if(!token){
+        res.status(404).send("token invalid");
+    }else{
+        jwt.verify(token, process.env.secret_key, (err, decoded)=>{
+            if(err){
+                res.status(404).send("Invalid request");
+            }else{
+                next();
+            }
+        })
+    }
+}
+app.get("/verify", verifyJwt, (req, res)=>{
+    res.send("You have access");
+})
+
 //random string generator for username
 const characters ='abcdefghijklmnopqrstuvwxyz0123456789._$';
 function randomString(length) {
@@ -35,9 +54,26 @@ function randomString(length) {
 
     return result;
 }
+app.post("/mySocioCard", (req, res)=>{
+    console.log(req.body.Slno)
+    userTemplate.find({username: req.body.username}, (err, result)=>{
+        if(err){
+            res.status(404).send(err)
+        }else{
+            // console.log("Found material: "+result.length)
+            // console.log(result)
+            if(result.length!=0)
+                res.status(200).send(result);
+            else{
+                res.status(404).send("Theme not found");
+            }
+        }
+    })
+})
 
 app.post("/googlelogin", (req, res)=>{
   const {tokenId}=req.body;
+//   console.log(tokenId);
   client.verifyIdToken({idToken:tokenId, audience: "769406402556-njlr65a4ujf3t6knd4dv7hj4jf0f6ihv.apps.googleusercontent.com"} )
   .then(response=>{
     const {email_verified, name, email}=response.payload;
