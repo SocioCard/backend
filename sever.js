@@ -71,6 +71,33 @@ app.post("/mySocioCard", (req, res)=>{
     })
 })
 
+const checkUsername=(req, res, next)=>{
+    userTemplate.find({username: req.body.newUsername}, (err, result)=>{
+        if(err){
+            res.status(404).send(err)
+        }else{
+            if(result.length===0){
+                next();
+            }
+            else{
+                res.status(404).json({message:'Username is not avaiable'});
+            }
+        }
+    })
+}
+
+app.post("/admin/updateUsername", checkUsername, (req, res)=>{
+    const prevUsername=req.body.prev;
+    const newUsername=req.body.newUsername;
+    userTemplate.updateOne({username:prevUsername}, {$set :{username:newUsername}})
+    .then(response=>{
+        res.status(200).send("Updated Successfully");
+    })
+    .catch(err=>{
+        res.status(404).send("Error in update try again");
+    })
+})
+
 app.post("/googlelogin", (req, res)=>{
   const {tokenId}=req.body;
 //   console.log(tokenId);
