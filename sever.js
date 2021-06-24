@@ -15,7 +15,7 @@ dotenv.config();
 mongoose.connect(process.env.Database_access, ()=>console.log("database connected"));
 
 //middlewares
-app.use(cors());
+app.use(cors());    
 app.use(express.json());
 app.use(passport.initialize());
 
@@ -70,7 +70,9 @@ app.post("/mySocioCard", (req, res)=>{
         }
     })
 })
-
+app.post("/updateProfile",(req,res)=>{
+    
+})
 app.post("/googlelogin", (req, res)=>{
   const {tokenId}=req.body;
 //   console.log(tokenId);
