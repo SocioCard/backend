@@ -150,6 +150,7 @@ app.post('/updateUser', (req, res)=>{
         themes:user.themes,
         links:user.links,
         avatar:user.avatar,
+        social:user.social,
     }})
     .then(result=>{
         res.json(result);

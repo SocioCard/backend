@@ -11,6 +11,15 @@ const userTemplate = new mongoose.Schema({
         icon:{type:String},
         visible:{type:Boolean},
     }],
+    social: {
+        instagram:{type:String},
+        facebook:{type:String},
+        youtube:{type:String},
+        reddit:{type:String},
+        linkedin:{type:String},
+        twitter:{type:String},
+        pinterest:{type:String},
+    },
     avatar:{type:String},
 
 })
