@@ -20,8 +20,7 @@ const userTemplate = new mongoose.Schema({
         twitter:{type:String},
         pinterest:{type:String},
     },
-    avatar:{type:String},
-
+    image:{type:String},
 })
 
 module.exports=mongoose.model('users', userTemplate);

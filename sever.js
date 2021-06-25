@@ -9,7 +9,26 @@ const jwt=require("jsonwebtoken");
 const {OAuth2Client}=require('google-auth-library');
 const client=new OAuth2Client("769406402556-njlr65a4ujf3t6knd4dv7hj4jf0f6ihv.apps.googleusercontent.com");
 const userTemplate=require('./userTemplate');
+const multer = require('multer');
+var path = require('path');
+
+var router = express.Router();
+router.use(express.static(__dirname+"./public"));
 dotenv.config();
+
+
+var Storage = multer.diskStorage({
+    destination: './public/uploads',
+    filename:(req,file,cb)=>{
+        cb(null,file.fieldname+'_'+Date.now()+path.extname(file.originalname));
+    }
+});
+
+//multer middleware
+var upload = multer({
+    storage:Storage
+}).single('file');
+
 
 //Connecting mongodb 
 mongoose.connect(process.env.Database_access, ()=>console.log("database connected"));
@@ -19,8 +38,9 @@ app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
 
+
 app.get("/", (req, res)=>{
-    res.status(200).send("Hello world")
+    res.status(200).send("welcome to sociocard's server")
 })
 
 
@@ -55,7 +75,7 @@ function randomString(length) {
     return result;
 }
 app.post("/mySocioCard", (req, res)=>{
-    console.log(req.body.Slno)
+    //console.log(req.body.Slno)
     userTemplate.find({username: req.body.username}, (err, result)=>{
         if(err){
             res.status(404).send(err)
@@ -165,7 +185,7 @@ app.post("/facebooklogin", (req, res)=>{
     });
 })
 
-app.post('/updateUser', (req, res)=>{
+app.post('/updateUser', upload, (req, res)=>{
     const {user,id} = req.body;
     console.log(user);
     // console.log(id);
@@ -176,7 +196,6 @@ app.post('/updateUser', (req, res)=>{
         bio:user.bio,
         themes:user.themes,
         links:user.links,
-        avatar:user.avatar,
         social:user.social,
     }})
     .then(result=>{
@@ -189,9 +208,51 @@ app.post('/updateUser', (req, res)=>{
     })
 })
 
+app.post('/uploadImage', upload, (req,res) => {
+    var id = req.body.id;
+    userTemplate.updateOne({username:id}, {$set:{
+        image:req.file.filename,
+    }})
+    // .then(res=>{
+    //     //res.json(res);
+    //     console.log("image uploaded");
+    // })
+    // .catch(err=>{
+    //     //res.json(err);
+    //     console.log('error');
+    // })
+});
+
+var filepath1 = __dirname+'/public/uploads/'+'avatar.jpg';
+
+app.get('/image', function (req, res) {
+    res.sendFile(filepath1);
+})
+
+app.post('/getImage',(req,res) => {
+    console.log(req.body);
+    userTemplate.find({username: req.body.id}, (err, result)=>{
+        if(err){
+            res.status(404).send(err)
+        }else{
+            if(result.length!=0){
+                //console.log(result);
+                let imgName = result[0].image;
+                var filepath = __dirname+'/public/uploads/'+imgName;
+                res.sendFile(filepath);
+            }
+            else{
+                res.status(404).json({message:'User is not present'});
+            }
+        }
+    })
+})
+
+
 app.post("/userDetails", (req,res) => {
+    console.log(req.body);
     const {id} = req.body;
-    //console.log(path);
+    console.log(id);
     userTemplate.find({username:id}, (err,result) => {
         if(err){
             console.log(err)
