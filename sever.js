@@ -70,8 +70,64 @@ app.post("/mySocioCard", (req, res)=>{
         }
     })
 })
+
+const checkUsername=(req, res, next)=>{
+    // console.log(req.body)
+    userTemplate.find({username: req.body.newUsername}, (err, result)=>{
+        if(err){
+            res.status(404).send(err)
+        }else{
+            if(result.length===0){
+                next();
+            }
+            else{
+                res.status(404).json({message:'Username is not avaiable'});
+            }
+        }
+    })
+}
+
+app.post("/admin/updateUsername", checkUsername, (req, res)=>{
+    console.log(req.body)
+    const prevUsername=req.body.prevUsername;
+    const newUsername=req.body.newUsername;
+    userTemplate.updateOne({username:prevUsername}, {$set :{username:newUsername}})
+    .then(response=>{
+        res.status(200).send("Updated Successfully");
+    })
+    .catch(err=>{
+        res.status(404).send("Error in update try again");
+    })
+})
 app.post("/updateProfile",(req,res)=>{
-    
+        // console.log(req.body)
+    userTemplate.updateOne({username: req.body.username}, {$set:{
+        name:req.body.name,
+        bio:req.body.bio,
+    }})
+    .then(result=>{
+        console.log(result);
+        res.status(200).send("Updated Successfully");
+    })
+    .catch(err=>{
+        console.log(err)
+        res.status(404).send("Error in update try again");
+    })
+})
+
+app.post('/fetchDetails',(req,res)=>{
+    userTemplate.find({username: req.body.username}, (err, result)=>{
+        if(err){
+            res.status(404).send(err)
+        }else{
+            if(result.length!==0){
+                res.status(200).send(result)
+            }
+            else{
+                res.status(404).send("User not found!!!")
+            }
+        }
+    })
 })
 app.post("/googlelogin", (req, res)=>{
   const {tokenId}=req.body;
