@@ -101,7 +101,7 @@ const checkUsername=(req, res, next)=>{
                 next();
             }
             else{
-                res.status(404).json({message:'Username is not avaiable'});
+                res.status(200).json({message:'Username is not avaiable'});
             }
         }
     })
@@ -135,20 +135,19 @@ app.post("/updateProfile",(req,res)=>{
     })
 })
 
-app.post('/fetchDetails',(req,res)=>{
-    userTemplate.find({username: req.body.username}, (err, result)=>{
-        if(err){
-            res.status(404).send(err)
-        }else{
-            if(result.length!==0){
-                res.status(200).send(result)
-            }
-            else{
-                res.status(404).send("User not found!!!")
-            }
-        }
+app.post('/admin/deleteAccount', (req,res)=>{   
+    console.log("account to be deleted: "+req.body.id);
+    userTemplate.deleteOne({username:req.body.id})
+    .then(response=>{
+        console.log(response)
+        res.status(200).send("Account deleted");
+    })
+    .catch(err=>{
+        console.log(err)
+        res.status(404).send("Error in deleting account...Try Again");
     })
 })
+
 app.post("/googlelogin", (req, res)=>{
   const {tokenId}=req.body;
 //   console.log(tokenId);
@@ -291,6 +290,21 @@ app.post("/userDetails", (req,res) => {
         else{
             //console.log(result)
             res.send(result);
+        }
+    })
+})
+
+app.post('/fetchDetails',(req,res)=>{
+    userTemplate.find({username: req.body.username}, (err, result)=>{
+        if(err){
+            res.status(404).send(err)
+        }else{
+            if(result.length!==0){
+                res.status(200).send(result)
+            }
+            else{
+                res.status(404).send("User not found!!!")
+            }
         }
     })
 })
