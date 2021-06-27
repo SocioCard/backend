@@ -243,52 +243,58 @@ app.post('/uploadImage', upload, (req,res) => {
     userTemplate.updateOne({username:id}, {$set:{
         image:req.file.filename,
     }})
-    // .then(res=>{
-    //     //res.json(res);
-    //     console.log("image uploaded");
-    // })
-    // .catch(err=>{
-    //     //res.json(err);
-    //     console.log('error');
-    // })
+    .then(res=>{
+        res.send('Image Uploaded!');
+        console.log("image uploaded");
+    })
+    .catch(err=>{
+        filepath = __dirname+'/public/uploads/'+req.file.filename;
+        res.send('Image Uploaded!');
+        console.log('error');
+    })
 });
 
-var filepath1 = __dirname+'/public/uploads/'+'avatar.jpg';
-
-app.get('/image', function (req, res) {
-    res.sendFile(filepath1);
-})
+var filepath = __dirname+'/public/'+'defaultUserProfileImage.png';
 
 app.post('/getImage',(req,res) => {
-    console.log(req.body);
+    //console.log(req.body);
     userTemplate.find({username: req.body.id}, (err, result)=>{
         if(err){
             res.status(404).send(err)
         }else{
             if(result.length!=0){
                 //console.log(result);
-                let imgName = result[0].image;
-                var filepath = __dirname+'/public/uploads/'+imgName;
+                let imgName = result[0].image;  
+                filepath = __dirname+'/public/uploads/'+imgName;
+                //console.log(filepath);
                 res.sendFile(filepath);
             }
             else{
-                res.status(404).json({message:'User is not present'});
+                res.status(404).json({message:'Error 404'});
             }
         }
     })
 })
 
+app.get('/image', function (req, res) {
+    console.log(filepath);
+    res.sendFile(filepath);    
+})
+
 
 app.post("/userDetails", (req,res) => {
-    console.log(req.body);
+    //console.log(req.body);
     const {id} = req.body;
-    console.log(id);
+    //console.log(id);
     userTemplate.find({username:id}, (err,result) => {
         if(err){
             console.log(err)
         }
         else{
             //console.log(result)
+            let imgName = result[0].image;  
+            if(imgName!=undefined&&imgName!="")
+                filepath = __dirname+'/public/uploads/'+imgName;
             res.send(result);
         }
     })
