@@ -4,7 +4,7 @@ const userTemplate = new mongoose.Schema({
     username:{type:String},
     name:{type:String},
     bio:{type:String},
-    themes:{type:String},
+    themes:{type:String, default:"1"},
     links:[{
         title:{type:String},
         link:{type:String},

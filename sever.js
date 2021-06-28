@@ -102,7 +102,7 @@ const checkUsername=(req, res, next)=>{
                 next();
             }
             else{
-                res.status(404).json({message:'Username is not avaiable'});
+                res.status(200).json({message:'Username is not avaiable'});
             }
         }
     })
@@ -139,20 +139,19 @@ app.post("/updateProfile",(req,res)=>{
     })
 })
 
-app.post('/fetchDetails',(req,res)=>{
-    userTemplate.find({username: req.body.username}, (err, result)=>{
-        if(err){
-            res.status(404).send(err)
-        }else{
-            if(result.length!==0){
-                res.status(200).send(result)
-            }
-            else{
-                res.status(404).send("User not found!!!")
-            }
-        }
+app.post('/admin/deleteAccount', (req,res)=>{   
+    console.log("account to be deleted: "+req.body.id);
+    userTemplate.deleteOne({username:req.body.id})
+    .then(response=>{
+        console.log(response)
+        res.status(200).send("Account deleted");
+    })
+    .catch(err=>{
+        console.log(err)
+        res.status(404).send("Error in deleting account...Try Again");
     })
 })
+
 app.post("/googlelogin", (req, res)=>{
   const {tokenId}=req.body;
 //   console.log(tokenId);
@@ -166,7 +165,7 @@ app.post("/googlelogin", (req, res)=>{
                 res.status(200).send({token:token, user:result});
             }else{
                 let username=name.replace(" ", "_")+randomString(6);
-                let newUser=new userTemplate({email,username, name, bio:"", themes:"", link:[]});
+                let newUser=new userTemplate({email,username, name, bio:"", themes:"1", link:[]});
                 newUser.save((err, data)=>{
                     if(err){
                         console.log(err);
@@ -205,7 +204,7 @@ app.post("/facebooklogin", (req, res)=>{
                 }else{
                     let username=name.replace(" ", "_").toLowerCase()+randomString(6);
                     let bio="Add your bio here"
-                    let newUser=new userTemplate({email,username, name, bio:"", themes:"", link:[]});
+                    let newUser=new userTemplate({email,username, name, bio:"", themes:"1", link:[]});
                     newUser.save((err, data)=>{
                         if(err){
                             res.status(404).send("Something went wrong");
@@ -260,6 +259,21 @@ app.post("/userDetails", (req,res) => {
             // if(imgName!=undefined&&imgName!="")
             //     filepath = __dirname+'/public/uploads/'+imgName;
             res.send(result);
+        }
+    })
+})
+
+app.post('/fetchDetails',(req,res)=>{
+    userTemplate.find({username: req.body.username}, (err, result)=>{
+        if(err){
+            res.status(404).send(err)
+        }else{
+            if(result.length!==0){
+                res.status(200).send(result)
+            }
+            else{
+                res.status(404).send("User not found!!!")
+            }
         }
     })
 })
