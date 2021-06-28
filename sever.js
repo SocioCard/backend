@@ -9,8 +9,10 @@ const jwt=require("jsonwebtoken");
 const {OAuth2Client}=require('google-auth-library');
 const client=new OAuth2Client("769406402556-njlr65a4ujf3t6knd4dv7hj4jf0f6ihv.apps.googleusercontent.com");
 const userTemplate=require('./userTemplate');
+const newsletterSubscriber=require('./newsletterSubscribers');
 const multer = require('multer');
 var path = require('path');
+const newsletterSubscribers = require('./newsletterSubscribers');
 
 var router = express.Router();
 router.use(express.static(__dirname+"./public"));
@@ -276,6 +278,17 @@ app.post('/fetchDetails',(req,res)=>{
             }
         }
     })
+})
+
+app.post('/subscribeNewsletter',(req,res)=>{
+    console.log(req.body)
+    let subscriber = new newsletterSubscriber({
+        email:req.body.email,
+    })
+    subscriber.save(function (err, subscriber) {
+        if (err) return console.error(err);
+        console.log(subscriber.email + " saved to subscriber collection.");
+    });
 })
 
 app.listen(process.env.PORT||5000, ()=>{
