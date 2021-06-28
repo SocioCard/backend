@@ -10,7 +10,9 @@ const userTemplate = new mongoose.Schema({
         link:{type:String},
         icon:{type:String},
         visible:{type:Boolean},
+        image:{type:String},
     }],
+    buymeacoffee:{type:String},
     social: {
         instagram:{type:String},
         facebook:{type:String},
@@ -19,6 +21,8 @@ const userTemplate = new mongoose.Schema({
         linkedin:{type:String},
         twitter:{type:String},
         pinterest:{type:String},
+        mail:{type:String},
+        call:{type:String},
     },
     image:{type:String},
 })

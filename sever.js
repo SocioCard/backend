@@ -34,9 +34,10 @@ var upload = multer({
 mongoose.connect(process.env.Database_access, ()=>console.log("database connected"));
 
 //middlewares
-app.use(cors());    
-app.use(express.json());
+app.use(cors());
 app.use(passport.initialize());
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb'}));
 
 
 app.get("/", (req, res)=>{
@@ -119,11 +120,14 @@ app.post("/admin/updateUsername", checkUsername, (req, res)=>{
         res.status(404).send("Error in update try again");
     })
 })
+
+
 app.post("/updateProfile",(req,res)=>{
         // console.log(req.body)
     userTemplate.updateOne({username: req.body.username}, {$set:{
         name:req.body.name,
         bio:req.body.bio,
+        image:req.body.image,
     }})
     .then(result=>{
         console.log(result);
@@ -226,8 +230,10 @@ app.post('/updateUser', upload, (req, res)=>{
         name:user.name,
         bio:user.bio,
         themes:user.themes,
+        buymeacoffee:user.buymeacoffee,
         links:user.links,
         social:user.social,
+        image:user.image,
     }})
     .then(result=>{
         res.json(result);
@@ -237,49 +243,6 @@ app.post('/updateUser', upload, (req, res)=>{
         res.json(err);
         console.log('error');
     })
-})
-
-app.post('/uploadImage', upload, (req,res) => {
-    var id = req.body.id;
-    userTemplate.updateOne({username:id}, {$set:{
-        image:req.file.filename,
-    }})
-    .then(res=>{
-        res.send('Image Uploaded!');
-        console.log("image uploaded");
-    })
-    .catch(err=>{
-        filepath = __dirname+'/public/uploads/'+req.file.filename;
-        res.send('Image Uploaded!');
-        console.log('error');
-    })
-});
-
-var filepath = __dirname+'/public/'+'defaultUserProfileImage.png';
-
-app.post('/getImage',(req,res) => {
-    //console.log(req.body);
-    userTemplate.find({username: req.body.id}, (err, result)=>{
-        if(err){
-            res.status(404).send(err)
-        }else{
-            if(result.length!=0){
-                //console.log(result);
-                let imgName = result[0].image;  
-                filepath = __dirname+'/public/uploads/'+imgName;
-                //console.log(filepath);
-                res.sendFile(filepath);
-            }
-            else{
-                res.status(404).json({message:'Error 404'});
-            }
-        }
-    })
-})
-
-app.get('/image', function (req, res) {
-    console.log(filepath);
-    res.sendFile(filepath);    
 })
 
 
@@ -293,9 +256,9 @@ app.post("/userDetails", (req,res) => {
         }
         else{
             //console.log(result)
-            let imgName = result[0].image;  
-            if(imgName!=undefined&&imgName!="")
-                filepath = __dirname+'/public/uploads/'+imgName;
+            // let imgName = result[0].image;  
+            // if(imgName!=undefined&&imgName!="")
+            //     filepath = __dirname+'/public/uploads/'+imgName;
             res.send(result);
         }
     })
