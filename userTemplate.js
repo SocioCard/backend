@@ -7,13 +7,12 @@ const userTemplate = new mongoose.Schema({
     themes:{type:String, default:"1"},
     links:[{
         title:{type:String},
+        type:{type:String},
         link:{type:String},
         icon:{type:String},
         visible:{type:Boolean},
         image:{type:String},
     }],
-    videoTitle:{type:String},
-    videoLink:{type:String},
     buymeacoffee:{type:String},
     social: {
         instagram:{type:String},
