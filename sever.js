@@ -10,6 +10,7 @@ const {OAuth2Client}=require('google-auth-library');
 const client=new OAuth2Client("769406402556-njlr65a4ujf3t6knd4dv7hj4jf0f6ihv.apps.googleusercontent.com");
 const userTemplate=require('./userTemplate');
 const newsletterSubscriber=require('./newsletterSubscribers');
+const nodemailer = require("nodemailer");
 const multer = require('multer');
 var path = require('path');
 const newsletterSubscribers = require('./newsletterSubscribers');
@@ -17,6 +18,14 @@ const newsletterSubscribers = require('./newsletterSubscribers');
 var router = express.Router();
 router.use(express.static(__dirname+"./public"));
 dotenv.config();
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'contact.sociocard@gmail.com',
+      pass: 'sociocard#1234'
+    }
+});
 
 
 var Storage = multer.diskStorage({
@@ -111,7 +120,7 @@ const checkUsername=(req, res, next)=>{
 }
 
 app.post("/admin/updateUsername", checkUsername, (req, res)=>{
-    console.log(req.body)
+    //console.log(req.body)
     const prevUsername=req.body.prevUsername;
     const newUsername=req.body.newUsername;
     userTemplate.updateOne({username:prevUsername}, {$set :{username:newUsername}})
@@ -132,7 +141,7 @@ app.post("/updateProfile",(req,res)=>{
         image:req.body.image,
     }})
     .then(result=>{
-        console.log(result);
+        //console.log(result);
         res.status(200).send("Updated Successfully");
     })
     .catch(err=>{
@@ -142,10 +151,10 @@ app.post("/updateProfile",(req,res)=>{
 })
 
 app.post('/admin/deleteAccount', (req,res)=>{   
-    console.log("account to be deleted: "+req.body.id);
+    //console.log("account to be deleted: "+req.body.id);
     userTemplate.deleteOne({username:req.body.id})
     .then(response=>{
-        console.log(response)
+        //console.log(response)
         res.status(200).send("Account deleted");
     })
     .catch(err=>{
@@ -194,7 +203,7 @@ app.post("/facebooklogin", (req, res)=>{
     })
     .then(response => response.json())
     .then(response =>{
-        console.log(response);
+        //console.log(response);
         const {email, name}=response;
         userTemplate.findOne({email}, (err, result)=>{
             if(err){
@@ -223,7 +232,6 @@ app.post("/facebooklogin", (req, res)=>{
 
 app.post('/updateUser', upload, (req, res)=>{
     const {user,id} = req.body;
-    console.log(user);
     // console.log(id);
     userTemplate.updateOne({username:id}, {$set:{
         email:user.email,
@@ -235,6 +243,8 @@ app.post('/updateUser', upload, (req, res)=>{
         links:user.links,
         social:user.social,
         image:user.image,
+        videoLink:user.videoLink,
+        videoTitle:user.videoTitle,
     }})
     .then(result=>{
         res.json(result);
@@ -281,7 +291,7 @@ app.post('/fetchDetails',(req,res)=>{
 })
 
 app.post('/subscribeNewsletter',(req,res)=>{
-    console.log(req.body)
+    //console.log(req.body)
     let subscriber = new newsletterSubscriber({
         email:req.body.email,
     })
@@ -289,7 +299,24 @@ app.post('/subscribeNewsletter',(req,res)=>{
         if (err) return console.error(err);
         console.log(subscriber.email + " saved to subscriber collection.");
     });
+    var mailOptions = {
+        from: 'contact.sociocard@gmail.com',
+        to: subscriber.email,
+        subject: 'Welcome!',
+        html: "<b>Thanks for subscribing to out Newsletter. Checkout our features!</b>",
+        text: 'Thanks for subscribing to out Newsletter. Checkout our features!'
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+    });
 })
+
+
 
 app.listen(process.env.PORT||5000, ()=>{
     console.log('Server started');

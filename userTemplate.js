@@ -12,6 +12,8 @@ const userTemplate = new mongoose.Schema({
         visible:{type:Boolean},
         image:{type:String},
     }],
+    videoTitle:{type:String},
+    videoLink:{type:String},
     buymeacoffee:{type:String},
     social: {
         instagram:{type:String},
