@@ -233,6 +233,7 @@ app.post("/facebooklogin", (req, res)=>{
 app.post('/updateUser', upload, (req, res)=>{
     const {user,id} = req.body;
     // console.log(id);
+    //console.log(user);
     userTemplate.updateOne({username:id}, {$set:{
         email:user.email,
         username:user.username,
