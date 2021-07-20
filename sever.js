@@ -150,7 +150,7 @@ app.post("/updateProfile",(req,res)=>{
     })
 })
 
-app.post('/admin/deleteAccount', (req,res)=>{   
+app.post('/admin/deleteAccount', (req,res)=>{
     //console.log("account to be deleted: "+req.body.id);
     userTemplate.deleteOne({username:req.body.id})
     .then(response=>{
@@ -165,7 +165,7 @@ app.post('/admin/deleteAccount', (req,res)=>{
 
 app.post("/googlelogin", (req, res)=>{
   const {tokenId}=req.body;
-//   console.log(tokenId);
+  //console.log(tokenId);
   client.verifyIdToken({idToken:tokenId, audience: "769406402556-njlr65a4ujf3t6knd4dv7hj4jf0f6ihv.apps.googleusercontent.com"} )
   .then(response=>{
     const {email_verified, name, email}=response.payload;
@@ -192,6 +192,7 @@ app.post("/googlelogin", (req, res)=>{
         res.status(404).send("Error in google OAuth");
     }
 })
+
 })
 
 
@@ -317,8 +318,8 @@ app.post('/subscribeNewsletter',(req,res)=>{
     });
 })
 
+const hostname="3.108.100.131";
 
-
-app.listen(process.env.PORT||5000, ()=>{
+app.listen(process.env.PORT||5000, hostname, ()=>{
     console.log('Server started');
 })
