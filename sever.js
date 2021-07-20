@@ -318,8 +318,7 @@ app.post('/subscribeNewsletter',(req,res)=>{
     });
 })
 
-const hostname="3.108.100.131";
 
-app.listen(process.env.PORT||5000, hostname, ()=>{
+app.listen(process.env.PORT||5000, '0.0.0.0', ()=>{
     console.log('Server started');
 })
