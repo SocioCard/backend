@@ -319,6 +319,6 @@ app.post('/subscribeNewsletter',(req,res)=>{
 })
 
 
-app.listen(process.env.PORT||5000, '0.0.0.0', ()=>{
+app.listen(process.env.PORT||6000, '0.0.0.0', ()=>{
     console.log('Server started');
 })
