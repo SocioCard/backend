@@ -176,6 +176,7 @@ app.post("/googlelogin", (req, res)=>{
                 res.status(200).send({token:token, user:result});
             }else{
                 let username=name.replace(" ", "_")+randomString(6);
+                username=username.replace(/ +/g, "");
                 let newUser=new userTemplate({email,username, name, bio:"", themes:"1", link:[]});
                 newUser.save((err, data)=>{
                     if(err){
@@ -215,6 +216,7 @@ app.post("/facebooklogin", (req, res)=>{
                     res.status(200).send({token:token, user:result});
                 }else{
                     let username=name.replace(" ", "_").toLowerCase()+randomString(6);
+                    username=username.replace(/ +/g, "");
                     let bio="Add your bio here"
                     let newUser=new userTemplate({email,username, name, bio:"", themes:"1", link:[]});
                     newUser.save((err, data)=>{
