@@ -86,6 +86,20 @@ function randomString(length) {
 
     return result;
 }
+
+app.get('/usersList', function(req, res) {
+    userTemplate.find({}, function(err, users) {
+        var userMap = {};
+  
+        // users.forEach(function(user) {
+        //     userMap[user._id] = user;
+        // });
+  
+        res.send(users);  
+    });
+});
+
+
 app.post("/mySocioCard", (req, res)=>{
     //console.log(req.body.Slno)
     userTemplate.find({username: req.body.username}, (err, result)=>{
@@ -175,8 +189,7 @@ app.post("/googlelogin", (req, res)=>{
                 const token=jwt.sign({email:result.email}, process.env.secret_key, {expiresIn:'50m'})
                 res.status(200).send({token:token, user:result});
             }else{
-                let username=name.replace(" ", "_")+randomString(6);
-                username=username.replace(/ +/g, "");
+                let username=name.replace(/ +/g, "_")+randomString(6);
                 let newUser=new userTemplate({email,username, name, bio:"", themes:"1", link:[]});
                 newUser.save((err, data)=>{
                     if(err){
@@ -215,8 +228,7 @@ app.post("/facebooklogin", (req, res)=>{
                     const token=jwt.sign({_id:result._id}, process.env.secret_key, {expiresIn:'50m'})
                     res.status(200).send({token:token, user:result});
                 }else{
-                    let username=name.replace(" ", "_").toLowerCase()+randomString(6);
-                    username=username.replace(/ +/g, "");
+                    let username=name.replace(/ +/g, "_").toLowerCase()+randomString(6);
                     let bio="Add your bio here"
                     let newUser=new userTemplate({email,username, name, bio:"", themes:"1", link:[]});
                     newUser.save((err, data)=>{
@@ -321,6 +333,6 @@ app.post('/subscribeNewsletter',(req,res)=>{
 })
 
 
-app.listen(process.env.PORT||6000, '0.0.0.0', ()=>{
+app.listen(process.env.PORT||4000, ()=>{
     console.log('Server started');
 })
